@@ -13,10 +13,12 @@ st.title("MIC API Test")
 
 DATABASE = "api_test.db"
 
+
 def init_db():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
-    cursor.execute('''
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS data (
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL UNIQUE,
@@ -24,9 +26,11 @@ def init_db():
             endpoint TEXT NOT NULL,
             success INTEGER NOT NULL
         )
-    ''')
+    """
+    )
     conn.commit()
     conn.close()
+
 
 def load():
     conn = sqlite3.connect(DATABASE)
@@ -35,27 +39,33 @@ def load():
     conn.close()
     return data
 
+
 def add_data(name, model_name, endpoint, request):
     conn = sqlite3.connect(DATABASE)
 
     response = requests.post(endpoint, json=request)
     data = pd.read_sql_query("SELECT name FROM data", conn)
-    if data["name"].values and name in data["name"].values[0]:
+    if len(data["name"].values) > 0 and name in data["name"].values[0]:
         st.error("Name already exists", icon="🚨")
         return True
     print(response.status_code)
+    print(endpoint)
     if response.status_code == 200:
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
-        cursor.execute('''
+        cursor.execute(
+            """
             INSERT INTO data (name, model_name, endpoint, success)
             VALUES (?, ?, ?, ?)
-        ''', (name, model_name, endpoint, 1))
+        """,
+            (name, model_name, endpoint, 1),
+        )
         conn.commit()
         conn.close()
         return True
     else:
         return False
+
 
 if __name__ == "__main__":
     init_db()
@@ -66,10 +76,13 @@ if __name__ == "__main__":
         with st.form("API Tester"):
             name = st.text_input("Name")
             model_name = st.text_input("Model Name")
-            endpoint = st.text_input("Endpoint URL")
+            endpoint = st.text_input(
+                "Endpoint URL",
+                help="Don't put the trailing slash. eg. http://localhost:8000/predict",
+            )
             request = st.text_area("JSON Request")
             submit = st.form_submit_button("Submit")
-            
+
             if submit:
                 try:
                     request_data = json.loads(request)

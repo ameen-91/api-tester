@@ -4,6 +4,11 @@ import pandas as pd
 import requests
 import json
 
+st.set_page_config(
+    page_title="MIC API Test",
+    page_icon="🧊",
+    initial_sidebar_state="expanded",
+)
 st.title("MIC API Test")
 
 DATABASE = "api_test.db"

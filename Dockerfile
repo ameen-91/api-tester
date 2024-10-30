@@ -10,4 +10,4 @@ COPY ./app /code/app
 
 EXPOSE 80
 
-CMD ["sh","-c","streamlit run app/app.py --server.port 80 & uvicorn app.main:app --host 0.0.0.0 --port 8080"]
+CMD ["sh","-c","streamlit run app/app.py --server.port 80"]
